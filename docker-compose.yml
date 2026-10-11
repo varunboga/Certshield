@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   mongodb:
     image: mongo:7.0
@@ -13,7 +15,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_URL=mongodb://host.docker.internal:27017
       - MONGODB_DB_NAME=certshield
       - API_KEY=change-me
       - VERIFY_BASE_URL=http://localhost:3001/v
@@ -25,6 +27,24 @@ services:
       - mongodb
     volumes:
       - ./backend/keys:/app/keys
+
+  admin-frontend:
+    build: ./frontend-admin
+    container_name: certshield-admin
+    ports:
+      - "3000:3000"
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+
+  verification-frontend:
+    build: ./frontend-portal
+    container_name: certshield-portal
+    ports:
+      - "3001:3001"
+    command: npm run dev -- --host
+    depends_on:
+      - backend
 
 volumes:
   mongo_data:
